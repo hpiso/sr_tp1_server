@@ -16,4 +16,8 @@ public class Calc {
         int y = Integer.parseInt(b);
         return x * y;
     }
+
+    public String test() {
+        return "test";
+    }
 }
