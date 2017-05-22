@@ -93,7 +93,7 @@ public class Server {
         System.out.println("Port number: ");
         int port = reader.nextInt();
 
-        Server server = new Server(5555);
+        Server server = new Server(port);
         server.order();
     }
 }
