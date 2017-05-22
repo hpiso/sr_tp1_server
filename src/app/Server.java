@@ -3,15 +3,14 @@ package app;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
-/**
- * Created by hugo on 17-05-21.
- */
 public class Server {
 
     private int port;
@@ -29,12 +28,12 @@ public class Server {
     }
 
     public void order() {
+
         if(serverSocket != null){
             try {
                 socketConnection = serverSocket.accept();
                 ObjectInputStream fromClient = new ObjectInputStream(socketConnection.getInputStream());
                 Command command = (Command) fromClient.readObject();
-                System.out.println(command.getClassName());
                 executeCommand(command);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -44,18 +43,30 @@ public class Server {
         }
     }
 
-
+    /**
+     * Execute command using reflexion
+     */
     public void executeCommand(Command command) {
 
-        try {
-            Calc calc = (Calc) Class.forName("app." + command.getClassName()).newInstance();
-            returnToClient(calc.test());
 
-        } catch (InstantiationException e) {
+        try {
+            Class<?> c = Class.forName(command.getClassName());
+            Object cObject = c.newInstance();
+            Class<?>[] paramTypes = {String.class, String.class};
+            Method cMethod = cObject.getClass().getMethod(command.getMethodName(), paramTypes);
+            Integer result = (Integer) cMethod.invoke(cObject,  command.getParams().get(0), command.getParams().get(1));
+
+            returnToClient(Integer.toString(result));
+
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
 
@@ -65,7 +76,6 @@ public class Server {
 
         try {
             ObjectOutputStream outToServer = new ObjectOutputStream(socketConnection.getOutputStream());
-            //Send command to server
 
             outToServer.writeUTF(response);
             outToServer.flush();
@@ -82,10 +92,7 @@ public class Server {
         System.out.println("Port number: ");
         int port = reader.nextInt();
 
-        Server server = new Server(port);
+        Server server = new Server(5555);
         server.order();
     }
-
-
-
 }
