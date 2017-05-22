@@ -27,6 +27,9 @@ public class Server {
         }
     }
 
+    /**
+     * Attend de recevoir les commandes du client
+     */
     public void order() {
 
         if(serverSocket != null){
@@ -44,11 +47,10 @@ public class Server {
     }
 
     /**
-     * Execute command using reflexion
+     * Execute une commande en utilisant la reflexion
      */
     public void executeCommand(Command command) {
-
-
+        
         try {
             Class<?> c = Class.forName(command.getClassName());
             Object cObject = c.newInstance();
@@ -72,6 +74,9 @@ public class Server {
 
     }
 
+    /**
+     * Retourne la valeur au client
+     */
     public void returnToClient(String response) {
 
         try {
@@ -87,7 +92,9 @@ public class Server {
         order();
     }
 
-
+    /**
+     * Point d'entré du serveur
+     */
     public static void main(String[] args) {
         Scanner reader = new Scanner(System.in);
         System.out.println("Port number: ");
