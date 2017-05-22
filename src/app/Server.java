@@ -50,7 +50,7 @@ public class Server {
      * Execute une commande en utilisant la reflexion
      */
     public void executeCommand(Command command) {
-        
+
         try {
             Class<?> c = Class.forName(command.getClassName());
             Object cObject = c.newInstance();
